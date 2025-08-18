@@ -8,7 +8,7 @@ namespace FileManager {
         return ReadFile(path, offset, offsetEnd);
     }
     bool FileManager::ReadFile(const wstring& filePath, UINT64 offset, UINT64 offsetEnd) {
-        if (!FileExists(filePath)) {
+        if (!FileExists(filePath)) [[unlikely]] {
             LOG_WARNING(L"FileManager - ReadFile", L"(" + filePath + L") File doesn't exist");
             return false;
         }
@@ -24,7 +24,7 @@ namespace FileManager {
             nullptr
         );
 
-        if (hFile == INVALID_HANDLE_VALUE) {
+        if (hFile == INVALID_HANDLE_VALUE) [[unlikely]] {
             LOG_ERROR("FileManager - ReadFile", "CreateFile");
             return false;
         }
@@ -32,7 +32,7 @@ namespace FileManager {
 
         // Start : Get Size + Checking
         LARGE_INTEGER fileSizeStruct;
-        if (!GetFileSizeEx(hFile, &fileSizeStruct)) {
+        if (!GetFileSizeEx(hFile, &fileSizeStruct)) [[unlikely]] {
             LOG_ERROR("FileManager - ReadFile", "Error with GetFileSizeEx");
             CloseHandle(hFile);
             return false;
@@ -41,13 +41,13 @@ namespace FileManager {
 
         UINT64 fileSize = fileSizeStruct.QuadPart;
 
-        if (fileSize < offset) {
+        if (fileSize < offset) [[unlikely]] {
             LOG_WARNING("FileManager - ReadFile", "Starting offset is bigger than the file size : "
                 + to_string(fileSize) + " < " + to_string(offset));
             CloseHandle(hFile);
             return false;
         }
-        if (fileSize < offsetEnd) {
+        if (fileSize < offsetEnd) [[unlikely]] {
             LOG_WARNING("FileManager - ReadFile", "Ending offset is bigger than the file size : "
                 + to_string(fileSize) + " < " + to_string(offsetEnd));
             CloseHandle(hFile);
@@ -56,7 +56,7 @@ namespace FileManager {
 
         offsetEnd = offsetEnd == 0 ? fileSize : offsetEnd;
 
-        if (offset > offsetEnd) {
+        if (offset > offsetEnd) [[unlikely]] {
             LOG_WARNING("FileManager - ReadFile", "Ending offset is bigger than the starting offset : "
                 + to_string(offset) + " > " + to_string(offsetEnd));
             CloseHandle(hFile);
@@ -65,7 +65,7 @@ namespace FileManager {
 
         UINT64 bytesToRead = offsetEnd - offset;
 
-        if (bytesToRead > MAXDWORD) {
+        if (bytesToRead > MAXDWORD) [[unlikely]] {
             LOG_WARNING("FileManager - ReadFile", "File to big (> 4GB)");
             CloseHandle(hFile);
             return false;
@@ -92,7 +92,7 @@ namespace FileManager {
 
         CloseHandle(hFile);
 
-        if (!success || bytesRead != bytesToRead) {
+        if (!success || bytesRead != bytesToRead) [[unlikely]] {
             LOG_ERROR("FileManager - ReadFile", "ReadFile - Readed: " + to_string(bytesRead) +
                 " / Should've been: " + to_string(bytesToRead));
             return false;
