@@ -2,7 +2,8 @@
 Should get rid off the include.h (include in .cpp and namespace std{/*What's used*/;} in .h)
 # FileManger
 Should get rid off the include.h (include in .cpp and namespace std{/*What's used*/;} in .h)\
-Should also create static function for easier use
+Should also create static function for easier use\
+TODO in the FileManager.h
 # Input
 Should get rid off the include.h (include in .cpp and namespace std{/*What's used*/;} in .h)
 # LogManger
