@@ -30,7 +30,7 @@
   - `NOLOGFILE`  
   - `NOTEMPFILE`  
   - `NOPERMFIL`  
-- This should completely disable logging when the macros are active.
+ This should completely disable logging when the macros are active.
 
 ---
 
