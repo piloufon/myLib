@@ -16,7 +16,7 @@
 ## FileManager
 - Remove `include.h` (include only in `.cpp` and keep `namespace std { /* what's used */ }` in `.h`).  
 - Create static functions for easier usage.  
-- TODO in `FileManager.h` for further improvements.
+- Presence of TODO in `FileManager.h`.
 
 ---
 
