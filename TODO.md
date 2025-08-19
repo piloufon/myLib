@@ -50,3 +50,4 @@
     - Understand and try ID3D12Device::CopyDescriptors for better performance when managing descriptor heaps.
   - Sampler
     - Explore ID3D12Device::CreateSampler and D3D12_SAMPLER_DESC/D3D12_STATIC_SAMPLER_DESC
+  - Continue reading https://learn.microsoft.com/en-us/windows/win32/api/d3d12/nn-d3d12-id3d12device
