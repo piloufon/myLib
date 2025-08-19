@@ -15,3 +15,4 @@ Add in the init of Factory RegisterOcclusionStatusWindow (from IDXGIFactory2)
 
 
 *Not really important/urgent -> using IDXGIFactory5::CheckFeatureSupport to check if OS has every function needed. And far after ID3D12Device::CheckFeatureSupport to check what abilities the hardware has (=> has RenderTarget, DepthStencil, ou ShaderResource, CUDA, ...)*
+*Also, I need to understand and try to use ID3D12Device::CopyDescriptors for better performance*
