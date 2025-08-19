@@ -1,18 +1,50 @@
-Add hint [[likely]] & [[unlikely]] 
-# WindowManager
-Should get rid off the include.h (include in .cpp and namespace std{/*What's used*/;} in .h)
-Add in WndProc case DXGI_STATUS_OCCLUDED & DXGI_STATUS_UNOCCLUDED
-# FileManger
-Should get rid off the include.h (include in .cpp and namespace std{/*What's used*/;} in .h)\
-Should also create static function for easier use\
-TODO in the FileManager.h
-# Input
-Should get rid off the include.h (include in .cpp and namespace std{/*What's used*/;} in .h)
-# LogManger
-Should create a way to not create log file if NOLOGFILE / NOTEMPFILE / NOPERMFIL with #ifdef (will completely disable the use of them)
-# DX12
-Add in the init of Factory RegisterOcclusionStatusWindow (from IDXGIFactory2)
+# TODO
 
+## General Improvements
+- Add hint `[[likely]]` & `[[unlikely]]` where appropriate.
 
-*Not really important/urgent -> using IDXGIFactory5::CheckFeatureSupport to check if OS has every function needed. And far after ID3D12Device::CheckFeatureSupport to check what abilities the hardware has (=> has RenderTarget, DepthStencil, ou ShaderResource, CUDA, ...)*
-*Also, I need to understand and try to use ID3D12Device::CopyDescriptors for better performance*
+---
+
+## WindowManager
+- Remove `include.h` (include only in `.cpp` and keep `namespace std { /* what's used */ }` in `.h`).  
+- Add handling in `WndProc` for:
+  - `DXGI_STATUS_OCCLUDED`
+  - `DXGI_STATUS_UNOCCLUDED`
+
+---
+
+## FileManager
+- Remove `include.h` (include only in `.cpp` and keep `namespace std { /* what's used */ }` in `.h`).  
+- Create static functions for easier usage.  
+- TODO in `FileManager.h` for further improvements.
+
+---
+
+## Input
+- Remove `include.h` (include only in `.cpp` and keep `namespace std { /* what's used */ }` in `.h`).
+
+---
+
+## LogManager
+- Create a way to **disable log file creation** if one of the macros is defined:  
+  - `NOLOGFILE`  
+  - `NOTEMPFILE`  
+  - `NOPERMFIL`  
+- This should completely disable logging when the macros are active.
+
+---
+
+## DX12
+
+### 🔹 Must do now
+- In factory initialization, add:
+  ```cpp
+  RegisterOcclusionStatusWindow (from IDXGIFactory2) to handle window occlusion status.
+
+### 🔹 To consider / explore later
+
+ - Feature & capability checks:
+   - Use IDXGIFactory5::CheckFeatureSupport to check if the OS supports all required DX12 features.
+   - Use ID3D12Device::CheckFeatureSupport to check hardware capabilities (RenderTarget, DepthStencil, ShaderResource, CUDA, etc.).
+  - Descriptor optimizations:
+    - Understand and try ID3D12Device::CopyDescriptors for better performance when managing descriptor heaps.
