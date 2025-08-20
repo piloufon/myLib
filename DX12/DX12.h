@@ -4,10 +4,9 @@
 #include "Device.h"
 #include "Factory.h"
 #include "CommandQueue.h"
-#include "Fence.h"
-#include "DescriptorHeapManager.h"
-#include "SwapChain.h"
-#include "BufferManager.h"
+//#include "DescriptorHeapManager.h"
+//#include "SwapChain.h"
+//#include "BufferManager.h"
 
 namespace WindowManager {class WindowManager; }
 
@@ -25,10 +24,9 @@ namespace DX12 {
         Factory                 dxFactory;
         Device                  dxDevice;
         CommandQueue            dxCommandQueue;
-        Fence                   dxFence;
-        DescriptorHeapManager   dxDescriptorHeapManager;
-        SwapChain               dxSwapChain;
-        BufferManager           dxBufferManager;
+        //DescriptorHeapManager   dxDescriptorHeapManager;
+        //SwapChain               dxSwapChain;
+        //BufferManager           dxBufferManager;
     };
 
 }
