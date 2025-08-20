@@ -16,7 +16,7 @@ namespace DX12 {
         }
         for (auto& cmdAllocator : poolAllocatorContext) {
             if (FAILED(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&cmdAllocator.allocator)))) [[unlikely]] {
-                LOG_ERROR(L"CommandQueue - InitializeCommandQueue", L"Failed to execute CreateCommandQueue");
+                LOG_ERROR(L"CommandQueue - InitializeCommandQueue", L"Failed to execute CreateCommandAllocator");
                 return false;
             }
         }
@@ -31,15 +31,28 @@ namespace DX12 {
             freeAllocatorContext.push(i);
         }
 
-        cmdQueueWorker = std::thread(ProcessCommandQueueWorker);
+        cmdQueueWorker = std::thread(&CommandQueue::ProcessCommandQueueWorker, this);
 
         LOG_INFO(L"CommandQueue - InitializeCommandQueue", L"Success in initializing DX12");
         return true;
     }
 
     void CommandQueue::Shutdown() {
+        {
+            std::unique_lock<std::mutex> lock(mtx);
+            while (!finishedAllocatorContext.empty()) {
+                ExecuteFinishedContexts();
+            }
+            while (!allocatorContextToClean.empty()) {
+                CleanAllocatorContext();
+            }
+        }
+
         shouldStop = true;
+        wakeFlag = true;
+        cv.notify_one();
         cmdQueueWorker.join();
+
 
         if (fenceEvent) {
             CloseHandle(fenceEvent);
@@ -116,8 +129,17 @@ namespace DX12 {
     void CommandQueue::ProcessCommandQueueWorker() {
         std::unique_lock<std::mutex> lock(mtx);
 
-        ExecuteFinishedContexts();
-        CleanAllocatorContext();
+        while (!shouldStop) {
+            cv.wait(lock, [&] { return wakeFlag || shouldStop; });
+
+            if (shouldStop) break;
+            if (wakeFlag) {
+                ExecuteFinishedContexts();
+                CleanAllocatorContext();
+                
+                wakeFlag = false;
+            }
+        }
     }
     void CommandQueue::ProcessCommandQueue() {
         {
@@ -130,7 +152,7 @@ namespace DX12 {
 
     void CommandQueue::ExecuteFinishedContexts() {
         if (finishedAllocatorContext.empty()) [[unlikely]] {
-            LOG_WARNING(L"CommandQueue - ExecuteFinishedContexts", L"finishedAllocatorContext is empty, cmdQueue won't execute anything");
+            LOG_DEBUG(L"CommandQueue - ExecuteFinishedContexts", L"finishedAllocatorContext is empty, cmdQueue won't execute anything");
             return;
         }
 
@@ -151,11 +173,11 @@ namespace DX12 {
         }
 
         if (!allCommandLists.empty()) [[likely]] {
+            LOG_DEBUG(L"CommandQueue - ExecuteFinishedContexts", L"Executed cmdList : " + std::to_wstring(allCommandLists.size()));
             cmdQueue->ExecuteCommandLists(
                 static_cast<UINT>(allCommandLists.size()),
                 allCommandLists.data()
             );
-
             ++fenceValue;
             cmdQueue->Signal(fence.Get(), fenceValue);
 

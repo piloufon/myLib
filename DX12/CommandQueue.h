@@ -28,7 +28,7 @@ namespace DX12 {
 		std::mutex mtx;
 		std::condition_variable cv;
 		std::atomic<bool> wakeFlag = false;
-		std::atomic<bool> shouldStop = false;  // Add this
+		std::atomic<bool> shouldStop = false;
 		std::thread cmdQueueWorker;
 		
 		void ProcessCommandQueueWorker();
