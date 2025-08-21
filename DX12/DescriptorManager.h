@@ -26,6 +26,8 @@ namespace DX12 {
         bool InitializeDescriptorHeapManager(ComPtr<ID3D12Device10> device);
         void Shutdown();
 
+        // BIG TODO : add D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV (most important and difficult cause ring buffer, etc... dynamicly too (that's why ring buf) per-frame)
+
         // Allocation/Deallocation
         [[nodiscard]] UINT8 AllocateRTV();
         void FreeRTV(UINT8 index);
@@ -34,6 +36,7 @@ namespace DX12 {
 
         [[nodiscard]] UINT16 AllocateSampler();
         UINT16 CreateSampler(const D3D12_SAMPLER_DESC&); // TODO : Create a way to add D3D12_STATIC_SAMPLER_DESC but in the sahder -> PSO (not now)
+
         // Handle getters
         inline D3D12_CPU_DESCRIPTOR_HANDLE GetRTVHandle(UINT8 index) {
             D3D12_CPU_DESCRIPTOR_HANDLE handle = rtvHeapStart;
