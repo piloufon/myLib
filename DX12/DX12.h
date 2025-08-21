@@ -4,6 +4,7 @@
 #include "Device.h"
 #include "Factory.h"
 #include "CommandQueue.h"
+#include "DescriptorManager.h"
 
 namespace WindowManager {class WindowManager; }
 
@@ -18,6 +19,7 @@ namespace DX12 {
     private:
         WindowManager::WindowManager* mainWindow;
 
+        DescriptorManager   dxDescriptorManager;
         Factory                 dxFactory;
         Device                  dxDevice;
         CommandQueue            dxCommandQueue;

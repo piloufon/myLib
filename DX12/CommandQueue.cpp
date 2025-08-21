@@ -122,7 +122,7 @@ namespace DX12 {
         }*/
 
         // Only the last cmdList is still open, no need to close the rest
-        context->cmdLists.back()->Close();
+        if(!context->cmdLists.empty()) [[unlikely]] context->cmdLists.back()->Close();
         finishedAllocatorContext.push(contextIndex);
     }
 
@@ -173,7 +173,7 @@ namespace DX12 {
         }
 
         if (!allCommandLists.empty()) [[likely]] {
-            LOG_DEBUG(L"CommandQueue - ExecuteFinishedContexts", L"Executed cmdList : " + std::to_wstring(allCommandLists.size()));
+            //LOG_DEBUG(L"CommandQueue - ExecuteFinishedContexts", L"Executed cmdList : " + std::to_wstring(allCommandLists.size()));
             cmdQueue->ExecuteCommandLists(
                 static_cast<UINT>(allCommandLists.size()),
                 allCommandLists.data()
