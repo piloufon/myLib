@@ -40,14 +40,14 @@
 - In factory initialization, add:
   ```cpp
   RegisterOcclusionStatusWindow (from IDXGIFactory2) to handle window occlusion status.
-
+- **BIG TODO** : add D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV (most important and difficult cause ring buffer, etc... dynamicly too (that's why ring buf) per-frame)
 ### 🔹 To consider / explore later
 
  - Feature & capability checks:
    - Use IDXGIFactory5::CheckFeatureSupport to check if the OS supports all required DX12 features.
    - Use ID3D12Device::CheckFeatureSupport to check hardware capabilities (RenderTarget, DepthStencil, ShaderResource, CUDA, etc.).
   - Descriptor optimizations:
-    - Understand and try ID3D12Device::CopyDescriptors for better performance when managing descriptor heaps.
-  - Sampler
-    - Explore ID3D12Device::CreateSampler and D3D12_SAMPLER_DESC/D3D12_STATIC_SAMPLER_DESC
+    - Understand and (if needed) try ID3D12Device::CopyDescriptors for better performance when managing descriptor heaps.
+  - Depth-Stencil View
+    - Explore D3D12_DSV_DIMENSION 
   - Continue reading https://learn.microsoft.com/en-us/windows/win32/api/d3d12/nn-d3d12-id3d12device
