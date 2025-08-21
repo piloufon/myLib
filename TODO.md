@@ -53,3 +53,4 @@
   - Continue reading https://learn.microsoft.com/en-us/windows/win32/api/d3d12/nn-d3d12-id3d12device
  - Check HDR in SwapChain
    - Probably with SetColorSpace1 (althrough work with non-HDR display, there will be colorClipping)
+   - Read https://learn.microsoft.com/en-us/windows/win32/api/dxgi1_4/nn-dxgi1_4-idxgiswapchain3
