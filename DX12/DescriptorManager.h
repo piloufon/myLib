@@ -37,7 +37,7 @@ namespace DX12 {
         [[nodiscard]] UINT16 AllocateSampler();
         UINT16 CreateSampler(const D3D12_SAMPLER_DESC&); // TODO : Create a way to add D3D12_STATIC_SAMPLER_DESC but in the sahder -> PSO (not now)
 
-        // Handle getters
+        // Handle getters -> could use template with if constexpr (not that useful but why not)
         inline D3D12_CPU_DESCRIPTOR_HANDLE GetRTVHandle(UINT8 index) {
             D3D12_CPU_DESCRIPTOR_HANDLE handle = rtvHeapStart;
             handle.ptr += index * rtvDescriptorSize;
@@ -53,7 +53,7 @@ namespace DX12 {
             handle.ptr += index * samplerDescriptorSize;
             return handle;
         }
-
+        
     private:
         static constexpr UINT singleDevice = 0;
         static constexpr UINT8 maxRTV = UINT8_MAX;

@@ -18,12 +18,22 @@ namespace DX12 {
 
 		[[nodiscard]] UINT8 GetAllocatorContextIndex();
 
+		// Automatic closing last cmdList 
 		ComPtr<ID3D12GraphicsCommandList10> StartRecording(UINT8 contextIndex, D3D12_COMMAND_LIST_TYPE typeCmdList = D3D12_COMMAND_LIST_TYPE_DIRECT);
-		//void AddCopyCommand(UINT8 contextIndex /*, copy params */);
-		//void AddResource(UINT8 contextIndex, ComPtr<ID3D12Resource> resource);
+
+		// TODO :
+			//void AddCopyCommand(UINT8 contextIndex /*, copy params */);
+			//void AddResource(UINT8 contextIndex, ComPtr<ID3D12Resource> resource);
+
 		void Finalize(UINT8 contextIndex);
 
+
+		ComPtr<ID3D12CommandQueue> GetpCommandQueue() { return cmdQueue; }
 		void ProcessCommandQueue();
+		void ExecuteFinishedContexts();
+		void CleanAllocatorContext();
+
+		void WaitForGPU();
 	private:
 		std::mutex mtx;
 		std::condition_variable cv;
@@ -32,8 +42,7 @@ namespace DX12 {
 		std::thread cmdQueueWorker;
 		
 		void ProcessCommandQueueWorker();
-		void ExecuteFinishedContexts();
-		void CleanAllocatorContext();
+		
 
 		ComPtr<ID3D12Device10> device;
 		ComPtr<ID3D12Fence1> fence;

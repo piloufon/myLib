@@ -81,7 +81,7 @@ namespace DX12 {
             // TODO : Create a way to create a new allocator for single use only then destroy /or/ make the thread (if possible) wait for some ms to see if an allocator is freed
             return INVALID_CONTEXT_INDEX;
         }
-        
+
         UINT8 result = freeAllocatorContext.front();
         freeAllocatorContext.pop();
         return result;
@@ -94,14 +94,15 @@ namespace DX12 {
         }
         auto* context = &poolAllocatorContext[contextIndex];
 
-        // Automatic closing last cmdList 
         if(!context->cmdLists.empty()) {
             HRESULT hr = context->cmdLists.back()->Close();
             if (FAILED(hr) && hr != E_FAIL) [[unlikely]] {
                 LOG_ERROR(L"CommandQueue - Finalize", L"Failed to close command list with unexpected error");
             }
         }
-        device->CreateCommandList(0, typeCmdList, context->allocator.Get(), nullptr, IID_PPV_ARGS(&context->cmdLists.emplace_back()));
+        if (FAILED(device->CreateCommandList(0, typeCmdList, context->allocator.Get(), nullptr, IID_PPV_ARGS(&context->cmdLists.emplace_back())))) [[unlikely]] {
+            LOG_ERROR(L"CommandQueue - StartRecording", L"Failed to create the commandList")
+        }
 
         return context->cmdLists.back();
     }
@@ -113,16 +114,9 @@ namespace DX12 {
 
         auto* context = &poolAllocatorContext[contextIndex];
 
-        // Depracted
-        /*for (auto& cmdList : context->cmdLists) {
-            HRESULT hr = cmdList->Close();
-            if (FAILED(hr) && hr != E_FAIL) [[unlikely]] {
-                LOG_ERROR(L"CommandQueue - Finalize", L"Failed to close command list with unexpected error");
-            }
-        }*/
-
-        // Only the last cmdList is still open, no need to close the rest
-        if(!context->cmdLists.empty()) [[unlikely]] context->cmdLists.back()->Close();
+        if (!context->cmdLists.empty()) [[unlikely]] {
+            context->cmdLists.back()->Close();
+        }
         finishedAllocatorContext.push(contextIndex);
     }
 
@@ -197,13 +191,13 @@ namespace DX12 {
     void CommandQueue::CleanAllocatorContext() {
         while (!allocatorContextToClean.empty()) {
             UINT8 index = allocatorContextToClean.front();
-            allocatorContextToClean.pop();
 
             auto* currentAllocator = &poolAllocatorContext[index];
 
             if (fence->GetCompletedValue() < currentAllocator->lastFenceValue) {
                 break;
             }
+            allocatorContextToClean.pop();
 
             currentAllocator->allocator.Get()->Reset();
 
@@ -212,6 +206,18 @@ namespace DX12 {
             currentAllocator->lastFenceValue = 0;
 
             freeAllocatorContext.push(index);
+
         }
+    }
+
+    void CommandQueue::WaitForGPU() {
+        cmdQueue->Signal(fence.Get(), ++fenceValue);
+
+        if (fence->GetCompletedValue() < fenceValue) {
+            fence->SetEventOnCompletion(fenceValue, fenceEvent);
+            WaitForSingleObject(fenceEvent, INFINITE);
+        }
+
+        CleanAllocatorContext();
     }
 }

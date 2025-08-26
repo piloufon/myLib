@@ -5,17 +5,22 @@ namespace DX12 {
         this->device = device;
 
         if (!InitRTVs()) [[unlikely]] {
-            LOG_ERROR(L"DescriptorManager - InitializeDescriptorHeapManager", L"Failed to initialize descriptor heaps");
+            LOG_ERROR(L"DescriptorManager - InitializeDescriptorHeapManager", L"Failed to initialize RTV heaps");
             return false;
         }
         if (!InitDSVs()) [[unlikely]] {
-            LOG_ERROR(L"DescriptorManager - InitializeDescriptorHeapManager", L"Failed to initialize descriptor heaps");
+            LOG_ERROR(L"DescriptorManager - InitializeDescriptorHeapManager", L"Failed to initialize DSV heaps");
+            return false;
+        }
+        if (!InitSamplers()) [[unlikely]] {
+            LOG_ERROR(L"DescriptorManager - InitializeDescriptorHeapManager", L"Failed to initialize Sampler heaps");
             return false;
         }
 
         return true;
     }
     void DescriptorManager::Shutdown() {
+        samplerDescHeap.Reset();
         rtvDescHeap.Reset();
         dsvDescHeap.Reset();
         device.Reset();
@@ -127,10 +132,14 @@ namespace DX12 {
     }
     UINT16 DescriptorManager::AllocateSampler() {
         if (freeSamplerSlots.empty()) [[unlikely]] {
-            LOG_ERROR(L"DescriptorManager - AllocateDSV", L"No free DSV slots available");
-            return INVALID_DESCRIPTOR_INDEX;
+            LOG_ERROR(L"DescriptorManager - AllocateDSV", L"No free Sampler slots available");
+            return INVALID_DESCRIPTOR_SAMPLER_INDEX;
         }
-        return UINT16();
+        
+        UINT16 index = freeSamplerSlots.front();
+        freeSamplerSlots.pop();
+
+        return index;
     }
     UINT16 DescriptorManager::CreateSampler(const D3D12_SAMPLER_DESC& desc) {
         UINT16 index = AllocateSampler();
